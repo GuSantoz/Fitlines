@@ -1,0 +1,212 @@
+CREATE SCHEMA AEROPORTO_FITLINES DEFAULT CHARACTER SET utf8 ;
+USE AEROPORTO_FITLINES;
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`AEROPORTO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.AEROPORTO (
+  `id` INT NOT NULL,
+  `nome` VARCHAR(90) NULL,
+  `cidade` VARCHAR(90) NULL,
+  `estado` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`));
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`AVIAO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.AVIAO (
+  `id` INT NOT NULL,
+  `passageiro` VARCHAR(45) NULL,
+  `carga` VARCHAR(45) NULL,
+  `categoria` VARCHAR(45) NULL,
+  `modelo` VARCHAR(45) NULL,
+  `total_assentos` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`));
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`VOO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.VOO (
+  `num` INT NOT NULL,
+  `data` VARCHAR(45) NULL,
+  `qtd_p` INT NULL,
+  `comp_aerea` VARCHAR(45) NULL,
+  `horaP` VARCHAR(45) NULL,
+  `AEROPORTO_id` INT NOT NULL,
+  PRIMARY KEY (`num`),
+  INDEX `fk_VOO_AEROPORTO1_idx` (`AEROPORTO_id` ASC) VISIBLE,
+  CONSTRAINT `fk_VOO_AEROPORTO1`
+    FOREIGN KEY (`AEROPORTO_id`)
+    REFERENCES AEROPORTO_FITLINES.AEROPORTO(`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`PASSAGEM`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.PASSAGEM (
+  `cod` INT NOT NULL,
+  `classe` VARCHAR(45) NULL,
+  `hora` VARCHAR(45) NULL,
+  `data_ida` VARCHAR(45) NULL,
+  `data_volta` DATE NULL,
+  `valor` FLOAT NULL,
+  `portao` VARCHAR(45) NULL,
+  `AVIAO_id` INT NOT NULL,
+  PRIMARY KEY (`cod`, `AVIAO_id`),
+  INDEX `fk_PASSAGEM_AVIAO1_idx` (`AVIAO_id` ASC) VISIBLE,
+  CONSTRAINT `fk_PASSAGEM_AVIAO1`
+    FOREIGN KEY (`AVIAO_id`)
+    REFERENCES AEROPORTO_FITLINES.AVIAO(`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`PASSAGEIRO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.PASSAGEIRO (
+  `cpf` INT NOT NULL,
+  `primeiro_nome` VARCHAR(45) NOT NULL,
+  `sobrenome` VARCHAR(45) NOT NULL,
+  `rua` VARCHAR(45) NOT NULL,
+  `num` INT NOT NULL,
+  `bairro` VARCHAR(45) NOT NULL,
+  `contato` VARCHAR(45) NOT NULL,
+  `VOO_num` INT NOT NULL,
+  `PASSAGEM_cod` INT NOT NULL,
+  PRIMARY KEY (`cpf`),
+  INDEX `fk_PASSAGEIRO_VOO1_idx` (`VOO_num` ASC) VISIBLE,
+  INDEX `fk_PASSAGEIRO_PASSAGEM1_idx` (`PASSAGEM_cod` ASC) VISIBLE,
+  CONSTRAINT `fk_PASSAGEIRO_VOO1`
+    FOREIGN KEY (`VOO_num`)
+    REFERENCES AEROPORTO_FITLINES.VOO(`num`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_PASSAGEIRO_PASSAGEM1`
+    FOREIGN KEY (`PASSAGEM_cod`)
+    REFERENCES `AEROPORTO_FITLINES`.`PASSAGEM` (`cod`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`BAGAGEM`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.BAGAGEM (
+  `cod` INT NOT NULL,
+  `tamanho` VARCHAR(45) NULL,
+  `peso` VARCHAR(45) NULL,
+  `PASSAGEIRO_cpf` INT NOT NULL,
+  PRIMARY KEY (`cod`, `PASSAGEIRO_cpf`),
+  INDEX `fk_BAGAGEM_PASSAGEIRO1_idx` (`PASSAGEIRO_cpf` ASC) VISIBLE,
+  CONSTRAINT `fk_BAGAGEM_PASSAGEIRO1`
+    FOREIGN KEY (`PASSAGEIRO_cpf`)
+    REFERENCES AEROPORTO_FITLINES.PASSAGEIRO(`cpf`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`FORMA_PAGAMENTO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.FORMA_PAGAMENTO (
+  `idFormaPagamento` INT NOT NULL,
+  `cpfPassageiro-ce` VARCHAR(45) NULL,
+  PRIMARY KEY (`idFormaPagamento`));
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`AEROPORTO_permite_AVIAO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.AEROPORTO_permite_AVIAO (
+  `AEROPORTO_cod` INT NOT NULL,
+  `AVIAO_id` INT NOT NULL,
+  PRIMARY KEY (`AEROPORTO_cod`, `AVIAO_id`),
+  INDEX `fk_AEROPORTO_has_AVIAO_AVIAO1_idx` (`AVIAO_id` ASC) VISIBLE,
+  INDEX `fk_AEROPORTO_has_AVIAO_AEROPORTO1_idx` (`AEROPORTO_cod` ASC) VISIBLE,
+  CONSTRAINT `fk_AEROPORTO_has_AVIAO_AEROPORTO1`
+    FOREIGN KEY (`AEROPORTO_cod`)
+    REFERENCES AEROPORTO_FITLINES.AEROPORTO(`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_AEROPORTO_has_AVIAO_AVIAO1`
+    FOREIGN KEY (`AVIAO_id`)
+    REFERENCES AEROPORTO_FITLINES.AVIAO(`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`TRECHO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.TRECHO (
+  `cod` INT NOT NULL,
+  PRIMARY KEY (`cod`));
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`table2`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.table2 (
+);
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`VOO_pertence_TRECHO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.VOO_pertence_TRECHO (
+  `VOO_num` INT NOT NULL,
+  `TRECHO_cod` INT NOT NULL,
+  PRIMARY KEY (`VOO_num`, `TRECHO_cod`),
+  INDEX `fk_VOO_has_TRECHO_TRECHO1_idx` (`TRECHO_cod` ASC) VISIBLE,
+  INDEX `fk_VOO_has_TRECHO_VOO1_idx` (`VOO_num` ASC) VISIBLE,
+  CONSTRAINT `fk_VOO_has_TRECHO_VOO1`
+    FOREIGN KEY (`VOO_num`)
+    REFERENCES AEROPORTO_FITLINES.VOO(`num`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_VOO_has_TRECHO_TRECHO1`
+    FOREIGN KEY (`TRECHO_cod`)
+    REFERENCES AEROPORTO_FITLINES.TRECHO(`cod`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`PAGAMENTO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.PAGAMENTO (
+  `idPAGAMENTO` INT NOT NULL,
+  PRIMARY KEY (`idPAGAMENTO`));
+
+-- -----------------------------------------------------
+-- Table `AEROPORTO_FITLINES`.`VOO_chega_AEROPORTO`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.VOO_chega_AEROPORTO (
+  `VOO_num` INT NOT NULL,
+  `VOO_AEROPORTO_cod` INT NOT NULL,
+  `AEROPORTO_id` INT NOT NULL,
+  `horaC` VARCHAR(45) NULL,
+  PRIMARY KEY (`VOO_num`, `VOO_AEROPORTO_cod`, `AEROPORTO_id`),
+  INDEX `fk_VOO_has_AEROPORTO_AEROPORTO1_idx` (`AEROPORTO_id` ASC) VISIBLE,
+  INDEX `fk_VOO_has_AEROPORTO_VOO1_idx` (`VOO_num` ASC, `VOO_AEROPORTO_cod` ASC) VISIBLE,
+  CONSTRAINT `fk_VOO_has_AEROPORTO_VOO1`
+    FOREIGN KEY (`VOO_num`)
+    REFERENCES AEROPORTO_FITLINES.VOO(`num`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_VOO_has_AEROPORTO_AEROPORTO1`
+    FOREIGN KEY (`AEROPORTO_id`)
+    REFERENCES AEROPORTO_FITLINES.AEROPORTO(`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+USE `AEROPORTO_FITLINES` ;
+
+-- -----------------------------------------------------
+-- Placeholder table for view `AEROPORTO_FITLINES`.`view1`
+-- -----------------------------------------------------
+CREATE TABLE AEROPORTO_FITLINES.view1 (`id` INT);
+
+-- -----------------------------------------------------
+-- View `AEROPORTO_FITLINES`.`view1`
+-- -----------------------------------------------------
+DROP TABLE AEROPORTO_FITLINES.view1;
+USE `AEROPORTO_FITLINES`;
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

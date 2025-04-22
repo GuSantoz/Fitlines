@@ -1,0 +1,163 @@
+-- -----------------------------------------------------
+-- Dropar o schema e todas as tabelas dentro dele
+-- -----------------------------------------------------
+
+-- Dropar o schema, que vai remover todas as tabelas e objetos dentro dele
+DROP SCHEMA IF EXISTS AEROPORTO_FITLINES;
+
+-- Criar o schema novamente, caso precise recriar
+CREATE SCHEMA AEROPORTO_FITLINES DEFAULT CHARACTER SET utf8 ;
+USE AEROPORTO_FITLINES ;
+
+-- -----------------------------------------------------
+-- Criar as tabelas
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.AEROPORTO (
+  id INT NOT NULL,
+  nome VARCHAR(90) NULL,
+  cidade VARCHAR(90) NULL,
+  estado VARCHAR(45) NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.AVIAO (
+  id INT NOT NULL,
+  categoria VARCHAR(45) NULL,
+  modelo VARCHAR(45) NULL,
+  total_assentos INT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.TRECHO (
+  cod INT NOT NULL,
+  PRIMARY KEY (cod)
+);
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.VOO (
+  num INT NOT NULL,
+  data DATE NULL,
+  qtd_p INT NULL,
+  comp_aerea VARCHAR(45) NULL,
+  horaP TIME NULL,
+  horaC TIME NULL,
+  AVIAO_id INT NOT NULL,
+  AEROPORTO_id INT NOT NULL,
+  PRIMARY KEY (num),
+  FOREIGN KEY (AVIAO_id) REFERENCES AEROPORTO_FITLINES.AVIAO (id),
+  FOREIGN KEY (AEROPORTO_id) REFERENCES AEROPORTO_FITLINES.AEROPORTO (id)
+);
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.PASSAGEM (
+  cod INT NOT NULL,
+  classe VARCHAR(45) NULL,
+  hora TIME NULL,
+  data_ida DATE NULL,
+  data_volta DATE NULL,
+  valor FLOAT NULL,
+  portao VARCHAR(45) NULL,
+  VOO_num INT NOT NULL,
+  PRIMARY KEY (cod),
+  FOREIGN KEY (VOO_num) REFERENCES AEROPORTO_FITLINES.VOO (num)
+);
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.PASSAGEIRO (
+  cpf INT NOT NULL,
+  primeiro_nome VARCHAR(45) NOT NULL,
+  sobrenome VARCHAR(45) NOT NULL,
+  rua VARCHAR(45) NOT NULL,
+  num INT NOT NULL,
+  bairro VARCHAR(45) NOT NULL,
+  contato VARCHAR(45) NOT NULL,
+  PASSAGEM_cod INT NOT NULL,
+  PRIMARY KEY (cpf),
+  FOREIGN KEY (PASSAGEM_cod) REFERENCES AEROPORTO_FITLINES.PASSAGEM (cod)
+);
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.BAGAGEM (
+  cod INT NOT NULL,
+  tamanho VARCHAR(45) NULL,
+  peso VARCHAR(45) NULL,
+  PASSAGEIRO_cpf INT NOT NULL,
+  PRIMARY KEY (cod),
+  FOREIGN KEY (PASSAGEIRO_cpf) REFERENCES AEROPORTO_FITLINES.PASSAGEIRO (cpf)
+);
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.AEROPORTO_permite_AVIAO (
+  AEROPORTO_id INT NOT NULL,
+  AVIAO_id INT NOT NULL,
+  PRIMARY KEY (AEROPORTO_id, AVIAO_id),
+  FOREIGN KEY (AEROPORTO_id) REFERENCES AEROPORTO_FITLINES.AEROPORTO (id),
+  FOREIGN KEY (AVIAO_id) REFERENCES AEROPORTO_FITLINES.AVIAO (id)
+);
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.VOO_pertence_TRECHO (
+  VOO_num INT NOT NULL,
+  TRECHO_cod INT NOT NULL,
+  PRIMARY KEY (VOO_num, TRECHO_cod),
+  FOREIGN KEY (VOO_num) REFERENCES AEROPORTO_FITLINES.VOO (num),
+  FOREIGN KEY (TRECHO_cod) REFERENCES AEROPORTO_FITLINES.TRECHO (cod)
+);
+
+CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.AEROPORTO_administra_VOO (
+  AEROPORTO_id INT NOT NULL,
+  VOO_num INT NOT NULL,
+  PRIMARY KEY (AEROPORTO_id, VOO_num),
+  FOREIGN KEY (AEROPORTO_id) REFERENCES AEROPORTO_FITLINES.AEROPORTO (id),
+  FOREIGN KEY (VOO_num) REFERENCES AEROPORTO_FITLINES.VOO (num)
+);
+
+CREATE TABLE AEROPORTO_FITLINES.view1 (id INT);
+
+-- -----------------------------------------------------
+-- Inserir dados nas tabelas
+-- -----------------------------------------------------
+
+-- Inserir dados na tabela TRECHO
+INSERT INTO AEROPORTO_FITLINES.TRECHO (cod) VALUES
+(1), (2), (3), (4);
+
+-- Inserir dados na tabela AVIAO
+INSERT INTO AEROPORTO_FITLINES.AVIAO (id, categoria, modelo, total_assentos) VALUES
+(1, 'Boeing', '737', 150),
+(2, 'Airbus', 'A320', 180);
+
+-- Inserir dados na tabela AEROPORTO
+INSERT INTO AEROPORTO_FITLINES.AEROPORTO (id, nome, cidade, estado) VALUES
+(1, 'Aeroporto de São Paulo', 'São Paulo', 'SP'),
+(2, 'Aeroporto do Rio', 'Rio de Janeiro', 'RJ');
+
+-- Inserir dados na tabela VOO
+INSERT INTO AEROPORTO_FITLINES.VOO (num, data, qtd_p, comp_aerea, horaP, horaC, AVIAO_id, AEROPORTO_id) VALUES
+(1001, '2024-11-20', 120, 'Gol', '10:00:00', '12:00:00', 1, 1),
+(1002, '2024-11-21', 130, 'Latam', '15:00:00', '17:00:00', 2, 2);
+
+-- Inserir dados na tabela VOO_pertence_TRECHO
+INSERT INTO AEROPORTO_FITLINES.VOO_pertence_TRECHO (VOO_num, TRECHO_cod) VALUES
+(1001, 1),
+(1002, 2);
+
+-- Inserir dados na tabela PASSAGEM
+INSERT INTO AEROPORTO_FITLINES.PASSAGEM (cod, classe, hora, data_ida, data_volta, valor, portao, VOO_num) VALUES
+(101, 'Econômica', '10:00:00', '2024-11-20', '2024-11-21', 500.00, 'A1', 1001),
+(102, 'Executiva', '15:00:00', '2024-11-21', '2024-11-22', 1000.00, 'B2', 1002);
+
+-- Inserir dados na tabela PASSAGEIRO
+INSERT INTO AEROPORTO_FITLINES.PASSAGEIRO (cpf, primeiro_nome, sobrenome, rua, num, bairro, contato, PASSAGEM_cod) VALUES
+(123456789, 'Carlos', 'Silva', 'Rua A', 123, 'Centro', '999999999', 101),
+(987654321, 'Ana', 'Costa', 'Rua B', 456, 'Zona Sul', '988888888', 102);
+
+-- Inserir dados na tabela BAGAGEM
+INSERT INTO AEROPORTO_FITLINES.BAGAGEM (cod, tamanho, peso, PASSAGEIRO_cpf) VALUES
+(1, 'Média', '20kg', 123456789),
+(2, 'Grande', '30kg', 987654321);
+
+-- Inserir dados na tabela AEROPORTO_permite_AVIAO
+INSERT INTO AEROPORTO_FITLINES.AEROPORTO_permite_AVIAO (AEROPORTO_id, AVIAO_id) VALUES
+(1, 1),
+(2, 2);
+
+-- Inserir dados na tabela AEROPORTO_administra_VOO
+INSERT INTO AEROPORTO_FITLINES.AEROPORTO_administra_VOO (AEROPORTO_id, VOO_num) VALUES
+(1, 1001),
+(2, 1002);
