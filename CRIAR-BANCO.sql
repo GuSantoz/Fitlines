@@ -1,7 +1,3 @@
--- -----------------------------------------------------
--- Dropar o schema e todas as tabelas dentro dele
--- -----------------------------------------------------
-
 -- Dropar o schema, que vai remover todas as tabelas e objetos dentro dele
 DROP SCHEMA IF EXISTS AEROPORTO_FITLINES;
 
@@ -9,9 +5,7 @@ DROP SCHEMA IF EXISTS AEROPORTO_FITLINES;
 CREATE SCHEMA AEROPORTO_FITLINES DEFAULT CHARACTER SET utf8 ;
 USE AEROPORTO_FITLINES ;
 
--- -----------------------------------------------------
 -- Criar as tabelas
--- -----------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.AEROPORTO (
   id INT NOT NULL,
@@ -109,55 +103,43 @@ CREATE TABLE IF NOT EXISTS AEROPORTO_FITLINES.AEROPORTO_administra_VOO (
 
 CREATE TABLE AEROPORTO_FITLINES.view1 (id INT);
 
--- -----------------------------------------------------
 -- Inserir dados nas tabelas
--- -----------------------------------------------------
 
--- Inserir dados na tabela TRECHO
 INSERT INTO AEROPORTO_FITLINES.TRECHO (cod) VALUES
 (1), (2), (3), (4);
 
--- Inserir dados na tabela AVIAO
 INSERT INTO AEROPORTO_FITLINES.AVIAO (id, categoria, modelo, total_assentos) VALUES
 (1, 'Boeing', '737', 150),
 (2, 'Airbus', 'A320', 180);
 
--- Inserir dados na tabela AEROPORTO
 INSERT INTO AEROPORTO_FITLINES.AEROPORTO (id, nome, cidade, estado) VALUES
 (1, 'Aeroporto de São Paulo', 'São Paulo', 'SP'),
 (2, 'Aeroporto do Rio', 'Rio de Janeiro', 'RJ');
 
--- Inserir dados na tabela VOO
 INSERT INTO AEROPORTO_FITLINES.VOO (num, data, qtd_p, comp_aerea, horaP, horaC, AVIAO_id, AEROPORTO_id) VALUES
 (1001, '2024-11-20', 120, 'Gol', '10:00:00', '12:00:00', 1, 1),
 (1002, '2024-11-21', 130, 'Latam', '15:00:00', '17:00:00', 2, 2);
 
--- Inserir dados na tabela VOO_pertence_TRECHO
 INSERT INTO AEROPORTO_FITLINES.VOO_pertence_TRECHO (VOO_num, TRECHO_cod) VALUES
 (1001, 1),
 (1002, 2);
 
--- Inserir dados na tabela PASSAGEM
 INSERT INTO AEROPORTO_FITLINES.PASSAGEM (cod, classe, hora, data_ida, data_volta, valor, portao, VOO_num) VALUES
 (101, 'Econômica', '10:00:00', '2024-11-20', '2024-11-21', 500.00, 'A1', 1001),
 (102, 'Executiva', '15:00:00', '2024-11-21', '2024-11-22', 1000.00, 'B2', 1002);
 
--- Inserir dados na tabela PASSAGEIRO
 INSERT INTO AEROPORTO_FITLINES.PASSAGEIRO (cpf, primeiro_nome, sobrenome, rua, num, bairro, contato, PASSAGEM_cod) VALUES
 (123456789, 'Carlos', 'Silva', 'Rua A', 123, 'Centro', '999999999', 101),
 (987654321, 'Ana', 'Costa', 'Rua B', 456, 'Zona Sul', '988888888', 102);
 
--- Inserir dados na tabela BAGAGEM
 INSERT INTO AEROPORTO_FITLINES.BAGAGEM (cod, tamanho, peso, PASSAGEIRO_cpf) VALUES
 (1, 'Média', '20kg', 123456789),
 (2, 'Grande', '30kg', 987654321);
 
--- Inserir dados na tabela AEROPORTO_permite_AVIAO
 INSERT INTO AEROPORTO_FITLINES.AEROPORTO_permite_AVIAO (AEROPORTO_id, AVIAO_id) VALUES
 (1, 1),
 (2, 2);
 
--- Inserir dados na tabela AEROPORTO_administra_VOO
 INSERT INTO AEROPORTO_FITLINES.AEROPORTO_administra_VOO (AEROPORTO_id, VOO_num) VALUES
 (1, 1001),
 (2, 1002);
